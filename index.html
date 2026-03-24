@@ -380,8 +380,8 @@
         <p id="explanation-text">
           Deine Organisation hat den Zugriff auf diese Webseite blockiert, weil sie als Sicherheitsrisiko eingestuft wurde.
           Cloudflare Zero Trust analysiert jede Anfrage in Echtzeit und verhindert den Zugriff auf Seiten, die Malware, Phishing oder andere Bedrohungen enthalten könnten.
+          <br><br>Du wurdest <strong>nicht</strong> kompromittiert – der Schutz hat funktioniert, bevor dein Browser die Seite laden konnte.
         </p>
-        <p>Du wurdest <strong>nicht</strong> kompromittiert – der Schutz hat funktioniert, bevor dein Browser die Seite laden konnte.</p>
         <div id="reason-badge-container" class="hidden">
           <div class="reason-badge">
             <div class="reason-badge-dot"></div>
@@ -553,12 +553,6 @@
     } else {
       document.getElementById('query-item').classList.add('hidden');
     }
-
-    // Kontakt-Button: E-Mail mit vorausgefülltem Betreff
-    const contactLink = document.getElementById('contact-link');
-    const subject = 'Anfrage: Freigabe für ' + (p.siteUri ? decodeURIComponent(p.siteUri) : 'blockierte Seite') +
-      (queryId ? ' [ID: ' + queryId + ']' : '');
-    contactLink.href = 'mailto:security@weichert.at?subject=' + encodeURIComponent(subject);
 
     // Footer: Regel-ID + Filter-Typ
     const metaParts = [];
