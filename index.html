@@ -563,7 +563,7 @@
       document.getElementById('footer-meta').textContent = metaParts.join(' · ');
     }
     // Worker-URL – nach dem Deploy anpassen
-    const WORKER_URL = 'https://cf-block-mailer.weichert.at/api/request-unblock';
+    const WORKER_URL = '/api/request-unblock';
 
     async function requestUnblock() {
       const btn   = document.getElementById('contact-btn');
