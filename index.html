@@ -439,13 +439,14 @@
       <hr class="divider">
       <div class="contact-section">
         <p>War diese Blockierung ein Fehler oder benötigst du Zugriff auf diese Seite?</p>
-        <a id="contact-link" href="mailto:security@weichert.at" class="contact-btn">
+        <button id="contact-btn" class="contact-btn" onclick="requestUnblock()">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24">
             <rect x="2" y="4" width="20" height="16" rx="2" stroke="white" stroke-width="2"/>
             <path d="M2 7l10 7 10-7" stroke="white" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          Seite freigeben lassen
-        </a>
+          <span id="btn-label">Seite freigeben lassen</span>
+        </button>
+        <p id="contact-feedback" style="display:none;margin-top:12px;font-size:14px;"></p>
       </div>
 
     </div>
@@ -566,6 +567,50 @@
     if (p.userEmail) metaParts.push(p.userEmail);
     if (metaParts.length) {
       document.getElementById('footer-meta').textContent = metaParts.join(' · ');
+    }
+    // Worker-URL – nach dem Deploy anpassen
+    const WORKER_URL = 'https://cf-block-mailer.weichert.at/api/request-unblock';
+
+    async function requestUnblock() {
+      const btn   = document.getElementById('contact-btn');
+      const label = document.getElementById('btn-label');
+      const fb    = document.getElementById('contact-feedback');
+
+      btn.disabled = true;
+      label.textContent = 'Wird gesendet…';
+
+      try {
+        const res = await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            siteUri:    p.siteUri,
+            queryId:    queryId,
+            sourceIp:   p.sourceIp,
+            categories: allCategories,
+            userEmail:  p.userEmail,
+            ruleId:     p.ruleId,
+            filter:     p.filter,
+          }),
+        });
+
+        if (res.ok) {
+          btn.style.background = '#16a34a';
+          label.textContent = '✓ Anfrage gesendet';
+          fb.style.display = 'block';
+          fb.style.color = '#15803d';
+          fb.textContent = 'Deine Anfrage wurde an das IT-Team gesendet. Du wirst per E-Mail benachrichtigt.';
+        } else {
+          throw new Error('Server error');
+        }
+      } catch {
+        btn.disabled = false;
+        btn.style.background = '';
+        label.textContent = 'Seite freigeben lassen';
+        fb.style.display = 'block';
+        fb.style.color = '#b91c1c';
+        fb.textContent = 'Fehler beim Senden. Bitte wende dich direkt an security@weichert.at';
+      }
     }
   </script>
 </body>
