@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zugriff blockiert – Sicherheitswarnung</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap');
+
+    :root {
+      --orange: #F6821F;
+      --orange-light: #FFF3E8;
+      --orange-mid: #FDDDB8;
+      --orange-dark: #C05A00;
+      --white: #FFFFFF;
+      --gray-50: #F9FAFB;
+      --gray-100: #F3F4F6;
+      --gray-200: #E5E7EB;
+      --gray-400: #9CA3AF;
+      --gray-600: #4B5563;
+      --gray-800: #1F2937;
+      --gray-900: #111827;
+      --red-50: #FFF5F5;
+      --red-100: #FEE2E2;
+      --red-500: #EF4444;
+      --red-700: #B91C1C;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100vh;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0 1rem 3rem;
+    }
+
+    /* TOP BAR */
+    .topbar {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 1.5rem 0 0;
+      margin-bottom: 2.5rem;
+    }
+    .topbar svg { flex-shrink: 0; }
+    .topbar-divider {
+      width: 1px;
+      height: 28px;
+      background: var(--gray-200);
+    }
+    .topbar-org {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gray-600);
+    }
+
+    /* MAIN CARD */
+    .card {
+      width: 100%;
+      max-width: 680px;
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+    }
+
+    /* CARD HEADER */
+    .card-header {
+      background: linear-gradient(135deg, #F6821F 0%, #E86D10 100%);
+      padding: 2rem 2rem 1.75rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .shield-icon {
+      width: 52px;
+      height: 52px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      backdrop-filter: blur(4px);
+    }
+    .shield-icon svg { color: white; }
+    .card-header-text h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: white;
+      line-height: 1.25;
+      margin-bottom: 0.4rem;
+    }
+    .card-header-text p {
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.5;
+    }
+
+    /* BLOCKED URL BANNER */
+    .blocked-url {
+      background: var(--red-50);
+      border-bottom: 1px solid #FECACA;
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .blocked-url-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--red-500);
+      flex-shrink: 0;
+    }
+    .blocked-url-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--red-700);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+    .blocked-url-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--red-700);
+      word-break: break-all;
+    }
+
+    /* BODY */
+    .card-body {
+      padding: 1.75rem 2rem;
+    }
+
+    /* EXPLANATION BOX */
+    .explanation {
+      background: var(--orange-light);
+      border: 1px solid var(--orange-mid);
+      border-radius: var(--radius-sm);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .explanation h2 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--orange-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.75rem;
+    }
+    .explanation p {
+      font-size: 0.9375rem;
+      color: var(--gray-800);
+      line-height: 1.65;
+    }
+    .explanation p + p {
+      margin-top: 0.6rem;
+    }
+
+    /* REASON BADGE */
+    .reason-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--red-100);
+      border: 1px solid #FECACA;
+      border-radius: 999px;
+      padding: 4px 12px 4px 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--red-700);
+      margin-top: 0.75rem;
+    }
+    .reason-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--red-500);
+    }
+
+    /* INFO GRID */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 520px) {
+      .info-grid { grid-template-columns: 1fr; }
+    }
+    .info-item {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+    }
+    .info-item-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-400);
+      margin-bottom: 3px;
+    }
+    .info-item-value {
+      font-size: 13px;
+      color: var(--gray-800);
+      word-break: break-all;
+      font-family: 'DM Mono', monospace;
+    }
+    .info-item-value.normal {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+    }
+
+    /* WHAT TO DO */
+    .steps-section h2 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.75rem;
+    }
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--orange);
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step-text {
+      font-size: 0.9rem;
+      color: var(--gray-700, #374151);
+      line-height: 1.55;
+      padding-top: 3px;
+    }
+    .step-text strong { font-weight: 600; color: var(--gray-800); }
+
+    /* DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--gray-200);
+      margin: 1.5rem 0;
+    }
+
+    /* CONTACT BUTTON */
+    .contact-section {
+      text-align: center;
+    }
+    .contact-section p {
+      font-size: 0.875rem;
+      color: var(--gray-600);
+      margin-bottom: 0.75rem;
+    }
+    .contact-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--orange);
+      color: white;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.6rem 1.5rem;
+      border-radius: 999px;
+      transition: background 0.15s;
+    }
+    .contact-btn:hover { background: #E06B0A; }
+
+    /* FOOTER */
+    .footer {
+      width: 100%;
+      max-width: 680px;
+      margin-top: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cf-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 999px;
+      padding: 5px 12px 5px 8px;
+      font-size: 12px;
+      color: var(--gray-600);
+    }
+    .footer-meta {
+      font-size: 11px;
+      color: var(--gray-400);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* hidden elements */
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <!-- Cloudflare Logo: cloud icon left + wordmark right -->
+    <svg width="160" height="28" viewBox="0 0 160 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cloudflare" role="img">
+      <!-- Cloudflare cloud: characteristic shape with flat bottom, orange body, lighter top-right bump -->
+      <!-- Main orange cloud body -->
+      <path d="M22.6 19.8H5.4a3.4 3.4 0 0 1 0-6.8c.18 0 .36.01.54.04l.04-.34A7.6 7.6 0 0 1 13.5 6a7.58 7.58 0 0 1 7.12 4.97 4.7 4.7 0 0 1 2-.44 4.76 4.76 0 0 1 4.76 4.76 4.76 4.76 0 0 1-4.78 4.51z" fill="#F6821F"/>
+      <!-- Lighter yellow-orange top-right bump (highlights the 3D cloud shape) -->
+      <path d="M26.4 13.4c-.1 0-.22 0-.32.01a3.2 3.2 0 0 0-3.18-2.85c-.56 0-1.08.15-1.53.41a4.5 4.5 0 0 0-4.2-2.9 4.52 4.52 0 0 0-4.52 4.52c0 .09 0 .18.01.27l-.28-.01a3.1 3.1 0 0 0 0 6.2h14.02a3.0 3.0 0 0 0 3-3 3.0 3.0 0 0 0-3.02-2.65z" fill="#FBAD41"/>
+      <!-- Wordmark "Cloudflare" in dark charcoal, same weight as official logo -->
+      <text x="33" y="20" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="13.5" font-weight="400" fill="#404040" letter-spacing="0.01em">Cloudflare</text>
+    </svg>
+    <div class="topbar-divider"></div>
+    <div class="topbar-org" id="org-name">Zero Trust Security</div>
+  </div>
+
+  <!-- MAIN CARD -->
+  <div class="card">
+
+    <!-- Header -->
+    <div class="card-header">
+      <div class="shield-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24">
+          <path stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 8v4M12 16h.01"/>
+        </svg>
+      </div>
+      <div class="card-header-text">
+        <h1 id="header-title">Diese Webseite wurde gesperrt</h1>
+        <p id="header-sub">Cloudflare Zero Trust hat dich vor einer potenziell gefährlichen Webseite geschützt.</p>
+      </div>
+    </div>
+
+    <!-- Blocked URL -->
+    <div class="blocked-url">
+      <div class="blocked-url-dot"></div>
+      <span class="blocked-url-label">Blockierte URL</span>
+      <span class="blocked-url-value" id="blocked-url-value">—</span>
+    </div>
+
+    <!-- Body -->
+    <div class="card-body">
+
+      <!-- Explanation -->
+      <div class="explanation">
+        <h2>Was ist passiert?</h2>
+        <p id="explanation-text">
+          Deine Organisation hat den Zugriff auf diese Webseite blockiert, weil sie als Sicherheitsrisiko eingestuft wurde.
+          Cloudflare Zero Trust analysiert jede Anfrage in Echtzeit und verhindert den Zugriff auf Seiten, die Malware, Phishing oder andere Bedrohungen enthalten könnten.
+        </p>
+        <p>Du wurdest <strong>nicht</strong> kompromittiert – der Schutz hat funktioniert, bevor dein Browser die Seite laden konnte.</p>
+        <div id="reason-badge-container" class="hidden">
+          <div class="reason-badge">
+            <div class="reason-badge-dot"></div>
+            <span id="reason-badge-text">Kategorie: Unbekannt</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Grid -->
+      <div class="info-grid" id="info-grid">
+        <div class="info-item" id="time-item">
+          <div class="info-item-label">Zeitpunkt</div>
+          <div class="info-item-value normal" id="time-value">—</div>
+        </div>
+        <div class="info-item" id="source-item">
+          <div class="info-item-label">Deine IP-Adresse</div>
+          <div class="info-item-value" id="source-value">—</div>
+        </div>
+        <div class="info-item" id="device-item">
+          <div class="info-item-label">Geräte-ID</div>
+          <div class="info-item-value" id="device-value">—</div>
+        </div>
+        <div class="info-item" id="query-item">
+          <div class="info-item-label">Anfrage-ID</div>
+          <div class="info-item-value" id="query-value">—</div>
+        </div>
+      </div>
+
+      <!-- Steps -->
+      <div class="steps-section">
+        <h2>Was kannst du tun?</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-text">
+              <strong>Überprüfe die URL.</strong> Stelle sicher, dass du die richtige Adresse aufgerufen hast. Tippfehler in URLs können auf Phishing-Seiten führen.
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-text">
+              <strong>Handelt es sich um eine legitime Seite?</strong> Wenn du sicher bist, dass die Blockierung ein Fehler ist, kontaktiere dein IT-Team über die Schaltfläche unten.
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-text">
+              <strong>Im Zweifelsfall: Finger weg.</strong> Wenn du dir nicht sicher bist, ob die Seite vertrauenswürdig ist, verlasse diese Seite und navigiere zu deinem Ziel über einen verifizierten Link.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <hr class="divider">
+      <div class="contact-section">
+        <p>War diese Blockierung ein Fehler oder benötigst du Zugriff auf diese Seite?</p>
+        <a id="contact-link" href="mailto:security@weichert.at" class="contact-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="20" height="16" rx="2" stroke="white" stroke-width="2"/>
+            <path d="M2 7l10 7 10-7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Seite freigeben lassen
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="cf-badge">
+      <svg width="12" height="12" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.6 19.8H5.4a3.4 3.4 0 0 1 0-6.8c.18 0 .36.01.54.04l.04-.34A7.6 7.6 0 0 1 13.5 6a7.58 7.58 0 0 1 7.12 4.97 4.7 4.7 0 0 1 2-.44 4.76 4.76 0 0 1 4.76 4.76 4.76 4.76 0 0 1-4.78 4.51z" fill="#F6821F"/>
+        <path d="M26.4 13.4c-.1 0-.22 0-.32.01a3.2 3.2 0 0 0-3.18-2.85c-.56 0-1.08.15-1.53.41a4.5 4.5 0 0 0-4.2-2.9 4.52 4.52 0 0 0-4.52 4.52c0 .09 0 .18.01.27l-.28-.01a3.1 3.1 0 0 0 0 6.2h14.02a3.0 3.0 0 0 0 3-3 3.0 3.0 0 0 0-3.02-2.65z" fill="#FBAD41"/>
+      </svg>
+      Geschützt von Cloudflare Zero Trust
+    </div>
+    <div class="footer-meta" id="footer-meta">—</div>
+  </div>
+
+  <script>
+    function getParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name) || '';
+    }
+
+    function formatTs(ts) {
+      if (!ts) return null;
+      const n = parseInt(ts, 10);
+      if (isNaN(n)) return ts;
+      const d = new Date(n * 1000);
+      return d.toLocaleString('de-DE', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+    }
+
+    function shortenId(id) {
+      if (!id || id.length < 12) return id;
+      return id.substring(0, 8) + '…' + id.substring(id.length - 4);
+    }
+
+    const p = {
+      url: getParam('url'),
+      name: getParam('name'),
+      headerText: getParam('header_text'),
+      footerText: getParam('footer_text'),
+      blockReason: getParam('block_reason'),
+      timestamp: getParam('timestamp'),
+      sourceIp: getParam('source_ip'),
+      deviceId: getParam('device_id'),
+      queryId: getParam('query_id'),
+      ruleId: getParam('rule_id'),
+      userId: getParam('user_id'),
+      mailtoAddress: getParam('mailto_address'),
+      mailtoSubject: getParam('mailto_subject'),
+    };
+
+    // Org name
+    if (p.name) {
+      document.getElementById('org-name').textContent = p.name;
+    }
+
+    // Header title
+    if (p.headerText) {
+      document.getElementById('header-title').textContent = p.headerText;
+    }
+
+    // Footer text → explanation
+    if (p.footerText) {
+      document.getElementById('explanation-text').innerHTML =
+        p.footerText + '<br><br>Du wurdest <strong>nicht</strong> kompromittiert – der Schutz hat funktioniert, bevor dein Browser die Seite laden konnte.';
+    }
+
+    // Blocked URL
+    if (p.url) {
+      document.getElementById('blocked-url-value').textContent = p.url;
+    }
+
+    // Block reason badge
+    if (p.blockReason) {
+      document.getElementById('reason-badge-text').textContent = 'Grund: ' + p.blockReason;
+      document.getElementById('reason-badge-container').classList.remove('hidden');
+    }
+
+    // Info grid
+    if (p.timestamp) {
+      document.getElementById('time-value').textContent = formatTs(p.timestamp) || p.timestamp;
+    } else {
+      document.getElementById('time-item').classList.add('hidden');
+    }
+
+    if (p.sourceIp) {
+      document.getElementById('source-value').textContent = p.sourceIp;
+    } else {
+      document.getElementById('source-item').classList.add('hidden');
+    }
+
+    if (p.deviceId) {
+      document.getElementById('device-value').textContent = shortenId(p.deviceId);
+      document.getElementById('device-value').title = p.deviceId;
+    } else {
+      document.getElementById('device-item').classList.add('hidden');
+    }
+
+    if (p.queryId) {
+      document.getElementById('query-value').textContent = shortenId(p.queryId);
+      document.getElementById('query-value').title = p.queryId;
+    } else {
+      document.getElementById('query-item').classList.add('hidden');
+    }
+
+    // Contact button
+    if (p.mailtoAddress) {
+      const subject = p.mailtoSubject ||
+        'Anfrage: Freigabe für ' + (p.url || 'blockierte Seite') +
+        (p.queryId ? ' [ID: ' + p.queryId + ']' : '');
+      document.getElementById('contact-link').href =
+        'mailto:' + p.mailtoAddress + '?subject=' + encodeURIComponent(subject);
+    }
+
+    // Footer meta
+    const metaParts = [];
+    if (p.ruleId) metaParts.push('Regel: ' + shortenId(p.ruleId));
+    if (p.userId) metaParts.push('User: ' + shortenId(p.userId));
+    if (metaParts.length) {
+      document.getElementById('footer-meta').textContent = metaParts.join(' · ');
+    }
+  </script>
+</body>
+</html>
