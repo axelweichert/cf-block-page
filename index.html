@@ -58,7 +58,7 @@
     .topbar svg { flex-shrink: 0; }
     .topbar-divider {
       width: 1px;
-      height: 44px;
+      height: 60px;
       background: var(--gray-200);
     }
     .topbar-org {
@@ -341,19 +341,8 @@
 
   <!-- TOP BAR -->
   <div class="topbar">
-    <!-- Cloudflare Logo: cloud top, CLOUDFLARE wordmark bottom (vertical stacked, as per official logo) -->
-    <svg width="110" height="52" viewBox="0 0 220 104" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cloudflare" role="img">
-      <!-- Orange main cloud body: large left hump, medium right hump, flat bottom -->
-      <path d="M168 28c-1.5 0-3 .2-4.4.5C160.2 14.6 147.8 5 133 5c-8.5 0-16.2 3.2-22 8.5C107 5.8 99.2 1 90 1 73.4 1 60 14.4 60 31c0 1.2.08 2.4.22 3.5C58.8 34.2 57.4 34 56 34c-13.3 0-24 10.7-24 24s10.7 24 24 24h112c12.1 0 22-9.9 22-22s-9.9-22-22-22z" fill="#F6821F"/>
-      <!-- Lighter yellow-orange smaller bump on right side -->
-      <path d="M186 44.5c-.5 0-1 .03-1.5.08C183.2 37.4 177 32 169.5 32c-3.8 0-7.2 1.4-9.8 3.7C157.2 29.8 151 26 144 26c-11 0-20 9-20 20 0 .6.03 1.2.08 1.8-.6-.06-1.2-.1-1.8-.1-8.3 0-15 6.7-15 15s6.7 15 15 15h64c7.7 0 14-6.3 14-14s-6.3-14.5-14-14.2z" fill="#FBAD41"/>
-      <!-- White highlight line on cloud (the characteristic stripe in the official logo) -->
-      <path d="M72 60 Q110 54 168 60" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.55"/>
-      <!-- CLOUDFLARE wordmark: wide-spaced caps, dark charcoal, below cloud -->
-      <text x="110" y="100" text-anchor="middle" font-family="'Arial Black','Helvetica Neue',Helvetica,Arial,sans-serif" font-size="21" font-weight="900" fill="#3D3D3D" letter-spacing="3">CLOUDFLARE</text>
-      <!-- Registered trademark -->
-      <text x="208" y="85" font-family="Arial,sans-serif" font-size="10" fill="#3D3D3D">®</text>
-    </svg>
+    <!-- Cloudflare Logo -->
+    <img src="./cloudflare-logo.png" alt="Cloudflare" style="height:72px;width:auto;display:block;" />
     <div class="topbar-divider"></div>
     <div class="topbar-org" id="org-name">Zero Trust Security</div>
   </div>
@@ -465,10 +454,7 @@
   <!-- FOOTER -->
   <div class="footer">
     <div class="cf-badge">
-      <svg width="12" height="12" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M22.6 19.8H5.4a3.4 3.4 0 0 1 0-6.8c.18 0 .36.01.54.04l.04-.34A7.6 7.6 0 0 1 13.5 6a7.58 7.58 0 0 1 7.12 4.97 4.7 4.7 0 0 1 2-.44 4.76 4.76 0 0 1 4.76 4.76 4.76 4.76 0 0 1-4.78 4.51z" fill="#F6821F"/>
-        <path d="M26.4 13.4c-.1 0-.22 0-.32.01a3.2 3.2 0 0 0-3.18-2.85c-.56 0-1.08.15-1.53.41a4.5 4.5 0 0 0-4.2-2.9 4.52 4.52 0 0 0-4.52 4.52c0 .09 0 .18.01.27l-.28-.01a3.1 3.1 0 0 0 0 6.2h14.02a3.0 3.0 0 0 0 3-3 3.0 3.0 0 0 0-3.02-2.65z" fill="#FBAD41"/>
-      </svg>
+      <img src="./cloudflare-logo.png" alt="Cloudflare" style="height:20px;width:auto;display:block;opacity:0.8;" />
       Geschützt von Cloudflare Zero Trust
     </div>
     <div class="footer-meta" id="footer-meta">—</div>
