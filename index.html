@@ -461,9 +461,10 @@
   </div>
 
   <script>
+    // Cloudflare Zero Trust Gateway URL-Parameter (cf_ Präfix laut offizieller Doku)
+    // https://developers.cloudflare.com/cloudflare-one/traffic-policies/http-policies/
     function getParam(name) {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name) || '';
+      return new URL(window.location.href).searchParams.get(name) || '';
     }
 
     function formatTs(ts) {
@@ -483,61 +484,59 @@
     }
 
     const p = {
-      url: getParam('url'),
-      name: getParam('name'),
-      headerText: getParam('header_text'),
-      footerText: getParam('footer_text'),
-      blockReason: getParam('block_reason'),
-      timestamp: getParam('timestamp'),
-      sourceIp: getParam('source_ip'),
-      deviceId: getParam('device_id'),
-      queryId: getParam('query_id'),
-      ruleId: getParam('rule_id'),
-      userId: getParam('user_id'),
-      mailtoAddress: getParam('mailto_address'),
-      mailtoSubject: getParam('mailto_subject'),
+      siteUri:        getParam('cf_site_uri'),         // blockierte URL
+      sourceIp:       getParam('cf_source_ip'),        // Quell-IP
+      deviceId:       getParam('cf_device_id'),        // Geräte-UUID
+      ruleId:         getParam('cf_rule_id'),          // Gateway Regel-ID
+      queryId:        getParam('cf_query_id'),         // DNS Query-ID
+      connectionId:   getParam('cf_connection_id'),    // Proxy Connection-ID
+      requestId:      getParam('cf_request_id'),       // HTTP Request-ID
+      accountId:      getParam('cf_account_id'),       // Account-ID
+      filter:         getParam('cf_filter'),           // http / dns / av / l4
+      categories:     getParam('cf_request_category_names'), // Kategorien (mehrfach)
+      userEmail:      getParam('cf_user_email'),       // User E-Mail
+      appName:        getParam('cf_application_name'), // App-Name
+      timestamp:      getParam('cf_timestamp'),        // Unix Timestamp
     };
 
-    // Org name
-    if (p.name) {
-      document.getElementById('org-name').textContent = p.name;
+    // Alle cf_request_category_names sammeln (können mehrfach vorkommen)
+    const allCategories = new URL(window.location.href).searchParams.getAll('cf_request_category_names');
+
+    // Blockierte URL anzeigen
+    if (p.siteUri) {
+      document.getElementById('blocked-url-value').textContent = decodeURIComponent(p.siteUri);
     }
 
-    // Header title
-    if (p.headerText) {
-      document.getElementById('header-title').textContent = p.headerText;
-    }
-
-    // Footer text → explanation
-    if (p.footerText) {
-      document.getElementById('explanation-text').innerHTML =
-        p.footerText + '<br><br>Du wurdest <strong>nicht</strong> kompromittiert – der Schutz hat funktioniert, bevor dein Browser die Seite laden konnte.';
-    }
-
-    // Blocked URL
-    if (p.url) {
-      document.getElementById('blocked-url-value').textContent = p.url;
-    }
-
-    // Block reason badge
-    if (p.blockReason) {
-      document.getElementById('reason-badge-text').textContent = 'Grund: ' + p.blockReason;
+    // Kategorie-Badge
+    if (allCategories.length > 0) {
+      document.getElementById('reason-badge-text').textContent = 'Kategorie: ' + allCategories.join(', ');
       document.getElementById('reason-badge-container').classList.remove('hidden');
+
+      // Erklärungstext mit Kategorien anreichern
+      const catText = allCategories.join(', ');
+      document.getElementById('explanation-text').innerHTML =
+        'Deine Organisation hat den Zugriff auf diese Webseite blockiert. ' +
+        'Sie wurde als <strong>' + catText + '</strong> eingestuft. ' +
+        'Cloudflare Zero Trust analysiert jede Anfrage in Echtzeit und verhindert den Zugriff auf Seiten, ' +
+        'die Malware, Phishing oder andere Bedrohungen enthalten könnten.' +
+        '<br><br>Du wurdest <strong>nicht</strong> kompromittiert – der Schutz hat funktioniert, bevor dein Browser die Seite laden konnte.';
     }
 
-    // Info grid
+    // Zeitstempel
     if (p.timestamp) {
       document.getElementById('time-value').textContent = formatTs(p.timestamp) || p.timestamp;
     } else {
       document.getElementById('time-item').classList.add('hidden');
     }
 
+    // Quell-IP
     if (p.sourceIp) {
       document.getElementById('source-value').textContent = p.sourceIp;
     } else {
       document.getElementById('source-item').classList.add('hidden');
     }
 
+    // Geräte-ID
     if (p.deviceId) {
       document.getElementById('device-value').textContent = shortenId(p.deviceId);
       document.getElementById('device-value').title = p.deviceId;
@@ -545,26 +544,26 @@
       document.getElementById('device-item').classList.add('hidden');
     }
 
-    if (p.queryId) {
-      document.getElementById('query-value').textContent = shortenId(p.queryId);
-      document.getElementById('query-value').title = p.queryId;
+    // Query-ID / Request-ID / Connection-ID (erstes verfügbares)
+    const queryId = p.queryId || p.requestId || p.connectionId;
+    if (queryId) {
+      document.getElementById('query-value').textContent = shortenId(queryId);
+      document.getElementById('query-value').title = queryId;
     } else {
       document.getElementById('query-item').classList.add('hidden');
     }
 
-    // Contact button
-    if (p.mailtoAddress) {
-      const subject = p.mailtoSubject ||
-        'Anfrage: Freigabe für ' + (p.url || 'blockierte Seite') +
-        (p.queryId ? ' [ID: ' + p.queryId + ']' : '');
-      document.getElementById('contact-link').href =
-        'mailto:' + p.mailtoAddress + '?subject=' + encodeURIComponent(subject);
-    }
+    // Kontakt-Button: E-Mail mit vorausgefülltem Betreff
+    const contactLink = document.getElementById('contact-link');
+    const subject = 'Anfrage: Freigabe für ' + (p.siteUri ? decodeURIComponent(p.siteUri) : 'blockierte Seite') +
+      (queryId ? ' [ID: ' + queryId + ']' : '');
+    contactLink.href = 'mailto:security@weichert.at?subject=' + encodeURIComponent(subject);
 
-    // Footer meta
+    // Footer: Regel-ID + Filter-Typ
     const metaParts = [];
     if (p.ruleId) metaParts.push('Regel: ' + shortenId(p.ruleId));
-    if (p.userId) metaParts.push('User: ' + shortenId(p.userId));
+    if (p.filter) metaParts.push('Filter: ' + p.filter.toUpperCase());
+    if (p.userEmail) metaParts.push(p.userEmail);
     if (metaParts.length) {
       document.getElementById('footer-meta').textContent = metaParts.join(' · ');
     }
