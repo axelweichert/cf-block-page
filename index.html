@@ -503,6 +503,8 @@
     // Alle cf_request_category_names sammeln (können mehrfach vorkommen)
     const allCategories = new URL(window.location.href).searchParams.getAll('cf_request_category_names');
 
+    // URL in der Browserzeile auf https://ztblock.weichert.at kürzen
+    window.history.replaceState({}, '', '/');
     // Blockierte URL anzeigen
     if (p.siteUri) {
       document.getElementById('blocked-url-value').textContent = decodeURIComponent(p.siteUri);
